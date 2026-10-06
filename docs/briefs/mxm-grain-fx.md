@@ -1,6 +1,6 @@
 # mxm-grain-fx — UI design brief
 
-Required by `MXM_DESIGN_SYSTEM.md` §14, and written before the editor it describes. This effect is
+Required by mxm-kit's [`MXM_DESIGN_SYSTEM.md`](https://github.com/mxm-audio/mxm-kit/blob/main/docs/MXM_DESIGN_SYSTEM.md) §14, and written before the editor it describes. This effect is
 an original granular processor on a live capture buffer, not the interface or constants of any
 product. Technique evidence is `research:effects/granular-processing.md`; one implementation read to
 build-from depth is `research:effects/mutable-clouds.md`.
@@ -130,8 +130,8 @@ texture; it is the thing that lets the gate happen. So:
 - **The grain envelope**, on Grain, drawn as the morph itself rather than as a percentage.
 
 Both are plugin-local, following `mxm-bucket-delay`'s constellation and `mxm-chorus-06`'s Sweep; both
-take their geometry from `crates/ui`'s telemetry tokens rather than inventing numbers; and anything
-live is driven from `Telemetry`, never from an editor-side clock. The app bar's level meter stays.
+take their geometry from `crates/ui`'s (mxm-kit's `mxm-ui`) telemetry tokens rather than inventing
+numbers; and anything live is driven from `Telemetry`, never from an editor-side clock. The app bar's level meter stays.
 
 **What is still deferred**: any display of the grain cloud *itself* — a scatter of live grains — which
 remains the guess revision 1 was right to refuse.

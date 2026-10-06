@@ -143,13 +143,13 @@ impl Capture {
     /// Read both channels at `age` samples behind the record head, four-point cubic.
     ///
     /// **Catmull-Rom, and the 30 dB is why** (Catmull and Rom, 1974; the same interpolating spline
-    /// `docs/oscillators/15-granular-in-the-wild.md` §15.9 calls a four-point cubic). That section
-    /// measures a grain train reading a full-band recording and puts linear interpolation 29.7 dB
-    /// behind cubic at unity rate and 29.5 dB behind at half rate — and the two identical above
-    /// unity, where the source's own harmonics fold and no interpolator repairs it. This crate
-    /// transposes two octaves either way, reads backwards, and keeps reading while the head is
-    /// held, so its read is moving at almost every setting the panel offers and the below-unity
-    /// half of that table is the half it lives in.
+    /// `docs/oscillators/15-granular-in-the-wild.md` §15.9, in mxm-kit, calls a four-point cubic).
+    /// That section measures a grain train reading a full-band recording and puts linear
+    /// interpolation 29.7 dB behind cubic at unity rate and 29.5 dB behind at half rate — and the
+    /// two identical above unity, where the source's own harmonics fold and no interpolator repairs
+    /// it. This crate transposes two octaves either way, reads backwards, and keeps reading while
+    /// the head is held, so its read is moving at almost every setting the panel offers and the
+    /// below-unity half of that table is the half it lives in.
     ///
     /// **The four taps are held inside the written history, tap by tap, rather than by clamping the
     /// age.** Clamping the age would move a read; clamping a tap repeats the sample at the edge,

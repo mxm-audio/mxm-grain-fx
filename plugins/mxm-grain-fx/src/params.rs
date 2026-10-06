@@ -3,7 +3,8 @@
 //! **Provisional until the listening gate.** `plans/plan-mxm-grain-fx.md` §9: the shell is built
 //! before the gate so the owner can play with it, and the ids are fixed the day the gate passes.
 //! Nothing is released, so changing one costs nothing yet — the same state the root `AGENTS.md`
-//! records as the only moment the collection's one id change was free. Do not treat these as
+//! records as the only moment the collection's one id change was free (since the split, mxm-kit's
+//! `docs/plugin-conventions.md`, *Permanent identifiers*). Do not treat these as
 //! permanent until the plugin's AGENTS.md stops saying they are not.
 
 use mxm_grain_fx_dsp::{
@@ -473,7 +474,7 @@ impl Default for MxmGrainFxParams {
             // overlapping grains read *identical* material and the overlap-add reconstructs the
             // input: measured purity 0.997 against a tone, which is to say a plain delay. The
             // effects rule wins, because a granular processor whose default is a delay demonstrates
-            // nothing. The reason and the measurement are in this plugin's AGENTS.md.
+            // nothing. The reason is in this plugin's AGENTS.md, the measurement in its NOTES.md.
             delay_variation: {
                 let (v2s, s2v) = variation_seconds(BUFFER_S);
                 FloatParam::new(
@@ -776,8 +777,9 @@ mod tests {
         }
     }
 
-    /// One trip through the host, as `vendor/nice-plug`'s CLAP wrapper makes it: the CLAP value is
-    /// the normalized value times the step count, the text carries the unit, and the parsed text
+    /// One trip through the host, as nice-plug's CLAP wrapper makes it (`vendor/nice-plug` before
+    /// the split; the mxm-audio/nice-plug fork since 2026-10-06): the CLAP value is the
+    /// normalized value times the step count, the text carries the unit, and the parsed text
     /// comes back through the parameter's normalized conversion before it is formatted again.
     /// Returns the failure, if the text changed or did not parse.
     ///

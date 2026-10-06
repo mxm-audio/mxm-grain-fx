@@ -168,8 +168,9 @@ cargo run -p mxm-grain-fx-dsp --release --example grain_cost
 What the tests cover: [NOTES.md § What the tests cover](NOTES.md#what-the-tests-cover).
 
 **Not verified here**: the plugin shell (G4), the editor (G5), the validator, the player and Bitwig
-(G6). Fidelity is UNVERIFIED by the root's default — nothing was measured against any product, and
-the listening gate (G3) is the owner's.
+(G6). Fidelity is UNVERIFIED by the root's default (the monorepo root's, before the split; the
+owner's working preference: never imply verification that did not happen) — nothing was measured
+against any product, and the listening gate (G3) is the owner's.
 
 # Child DOX Index
 

@@ -61,7 +61,7 @@ The control must make a few cents of detune reachable without sacrificing its tw
 independent contracts provide that:
 
 - **The travel.** The depth reaches `MAX_PITCH_SEMITONES` either way — two octaves — and it was
-  linear, against `crates/ui`'s single 200 px full-scale drag. That is a semitone every eight
+  linear, against `crates/ui`'s (mxm-kit's `mxm-ui`) single 200 px full-scale drag. That is a semitone every eight
   pixels, so everything from dead in tune to a quarter tone lived inside the first two, which is
   what the report measures. It is now `FloatRange::Skewed` at `skew_factor(-1.8)`: a quarter turn is
   19 cents, 40 % of the travel is the first whole semitone, half is about two, and the wide cloud
@@ -121,7 +121,8 @@ another visualization is designed.
 
 ## Cards as layout trees
 
-**Every card is a `mxm_ui::tree`** (`crates/ui/AGENTS.md`, *A card body as data*; in mxm-kit).
+**Every card is a `mxm_ui::tree`** (`crates/ui/AGENTS.md`, *A card body as data*; in mxm-kit, where
+it is now [`crates/ui/NOTES.md`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/ui/NOTES.md#a-card-body-as-data--tree)).
 `sections::card` describes each body once — knob rows at `KNOB_COLUMN` (`KNOB_COLUMN_MIN`), the
 envelope filling the rest of Grain shape's row, the timeline over Playback's knobs, Freeze's toggle
 — and that description is measured for the card's floor and height and drawn leaf by leaf through

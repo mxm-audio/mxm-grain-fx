@@ -5,7 +5,9 @@ of that recording — grains — are scattered in time and summed back over the 
 has its own length, position, pitch, direction, window and place in the stereo field, drawn when it
 starts and fixed for its life.
 
-Part of the [MXM Synth Collection](../../README.md). MIT licensed, CLAP only.
+Part of the MXM collection ([github.com/mxm-audio](https://github.com/mxm-audio)); this repository's
+[README](../../README.md). GPL-3.0-or-later — see the repository's [`LICENSE`](../../LICENSE) at its
+root. CLAP only.
 
 ## What it does
 

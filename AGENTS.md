@@ -112,21 +112,26 @@ technique or paper it comes from.
 # Ownership
 
 Root owns `Cargo.toml`, `Cargo.lock`, `LICENSE`, `NOTICE.md`, `TRADEMARKS.md`, `README.md`,
-`CONTRIBUTING.md`, `.cargo/`, `.github/`, `bundler.toml`, `test-bundles.txt` and `xtask/`.
+`CONTRIBUTING.md`, `.cargo/`, `.github/`, `bundler.toml` and `xtask/`. There is no
+`test-bundles.txt` here: it lists the plugins from other repositories that host tests load, and
+this repository has no host tests yet.
 Each folder with an `AGENTS.md` owns its contents; the index is below.
 
 **Dependencies are pinned exactly and `Cargo.lock` is committed.** The kit comes from mxm-kit at
 `v0.3.0`, another product's crates from its repository at a tag, and nice-plug and
 egui-baseview from their MXM forks (`[patch.crates-io]`).
 
-**Two tiers of tests.** `cargo test` builds the plugin and its DSP only — the loop for a
-change. `plugins/mxm-grain-fx/host-tests` loads the release bundle through MXM Player: it
-is a separate package so the fast tier never builds the player.
+**One tier of tests so far.** `cargo test` builds the plugin and its DSP only — the loop for a
+change. There is no `plugins/mxm-grain-fx/host-tests` package yet, so nothing here loads the
+release bundle through MXM Player; when one comes, it is a separate package so the fast tier
+never builds the player (checked 2026-10-06: neither `Cargo.toml`'s members nor CI has one).
 
 ## Windows, Linux and macOS — all three, always
 
 **An absolute requirement.** Everything here runs on all three; a change that works on one and
-breaks another is a broken change. CI builds and tests on all three.
+breaks another is a broken change. CI builds and tests on all three, on `v*` release tags or
+when started by hand (the owner, 2026-10-06); before a push, Windows and Linux are checked
+locally (*Verification*).
 
 - **Anything platform-specific is `cfg`-gated with every arm implemented**, never one arm and a
   silent nothing elsewhere.
@@ -165,10 +170,12 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test                                   # the fast tier: the plugin and its DSP
 cargo xtask bundle mxm-grain-fx --release
-cargo test -p mxm-grain-fx-host-tests            # the slow tier: through MXM Player
+# no slow tier yet: there is no mxm-grain-fx-host-tests package to run through MXM Player
 ```
 
-CI runs the same on Windows, macOS and Linux.
+Before a push, run the first three on Windows and again on Linux in WSL (the workspace's
+`wsl/AGENTS.md`). CI runs the same on Windows, macOS and Linux, but only on `v*` release tags or
+when started by hand (the owner, 2026-10-06), so only CI reaches macOS.
 
 # Child DOX Index
 

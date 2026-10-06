@@ -9,7 +9,8 @@
 //! ```
 //!
 //! Files land in `target/grain-fx-demo/`, which is build output and is never committed — the root
-//! `AGENTS.md`'s pre-public checklist keeps audio out of the tree.
+//! `AGENTS.md`'s pre-public checklist keeps audio out of the tree (the monorepo root's *Before this
+//! repository is made public*; since the split in mxm-kit's `docs/collection-rules.md`).
 
 use mxm_grain_fx_dsp::{Controls, GrainEngine, Randomisation};
 

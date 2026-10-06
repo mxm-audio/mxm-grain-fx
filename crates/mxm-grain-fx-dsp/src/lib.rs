@@ -6,11 +6,13 @@
 //! those references, not a copy of either**, and every constant here is chosen or measured for this
 //! implementation — none is read out of a product.
 //!
-//! Under the owner's ruling of 2026-09-09 (root `AGENTS.md`, *Research boundary*), facts from a
-//! maker's permissively licensed source cross into this repository freely and only *code* carries
-//! that licence's notice. **No source was opened while this crate was written** — it is clean-room
-//! from the research prose — so the crate carries no third-party notice and is MIT like its
-//! siblings.
+//! Under the owner's ruling of 2026-09-09 (root `AGENTS.md`, *Research boundary* — the monorepo's;
+//! since the split mxm-kit's `docs/collection-rules.md`, and this repository's root *Research
+//! citations*), facts from a maker's permissively licensed source cross into this repository freely
+//! and only *code* carries that licence's notice. **No source was opened while this crate was
+//! written** — it is clean-room from the research prose — so the crate carries no third-party
+//! notice and is MIT like its siblings (it was then; since the split it is GPL-3.0-or-later, the
+//! repository's licence).
 //!
 //! # The shape, in one paragraph
 //!
@@ -273,8 +275,8 @@ impl Randomisation {
 /// Everything the engine is asked to do.
 ///
 /// Nothing here is a parameter id or a range for the plugin shell — that is G4's, and
-/// `plans/AGENTS.md` keeps it out of the plan and out of this crate. These are the quantities the
-/// DSP needs, in their own units.
+/// `plans/AGENTS.md` (in the private archive) keeps it out of the plan and out of this crate.
+/// These are the quantities the DSP needs, in their own units.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Controls {
     /// Dry/wet crossfade. **Exactly zero is Off**: the wet fades out, the engine empties once and

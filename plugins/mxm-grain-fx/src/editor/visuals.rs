@@ -1,9 +1,9 @@
 //! The Playback card's buffer timeline, and the Grain card's envelope.
 //!
 //! Both are plugin-local, following `mxm-bucket-delay`'s constellation and `mxm-chorus-06`'s Sweep.
-//! Neither is a reusable type and neither belongs in `crates/ui`: design system §13 keeps a widget
-//! out of the shared crate until a second instrument needs it, and nothing else here draws a
-//! capture buffer.
+//! Neither is a reusable type and neither belongs in `crates/ui` (mxm-kit's `mxm-ui`): design
+//! system §13 keeps a widget out of the shared crate until a second instrument needs it, and
+//! nothing else here draws a capture buffer.
 //!
 //! **Geometry comes from `mxm_ui::visual`'s tokens**, so telemetry does not quietly grow a second
 //! design system, and **nothing here calls `navigation::at`** — a display is not a control, and the

@@ -27,9 +27,9 @@
 /// `grain_cost` measured the Hann end of the morph at 795.3 ns/frame against the ramp end's
 /// 558.7 at 63 live grains, so 3.76 of 12.26 ns — 31% of a grain — was one sine. The sibling
 /// `mxm-creative-sampler` took the same saving with a shared 1024-point table
-/// (`crates/mxm-creative-sampler-dsp/src/lib.rs`), and
-/// [`docs/oscillators/10-granular.md`](../../../docs/oscillators/10-granular.md) §10.8 lists it as
-/// one of the four cost decisions.
+/// (`crates/mxm-creative-sampler-dsp/src/lib.rs`, in mxm-creative-sampler), and mxm-kit's
+/// [`docs/oscillators/10-granular.md`](https://github.com/mxm-audio/mxm-kit/blob/main/docs/oscillators/10-granular.md)
+/// §10.8 lists it as one of the four cost decisions.
 ///
 /// **2048 rather than the sampler's 1024, because this table is held to a tighter number.** The
 /// sampler bounds its table against the 16-bit converter step; the test below keeps this one

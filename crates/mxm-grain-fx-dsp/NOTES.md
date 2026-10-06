@@ -11,8 +11,11 @@ is a different question*), facts from a maker's permissively licensed source cro
 with no source open, so it carries none and was MIT like its siblings at the time. Product plan:
 `plans/plan-mxm-grain-fx.md` in the private archive.
 
-Since the 2026-10 split, the root `AGENTS.md` named here is the monorepo's, in the private archive,
-and the crate takes the workspace's licence, GPL-3.0-or-later.
+Since the 2026-10 split, the root `AGENTS.md` named here is the monorepo's, in the private archive;
+its *Research boundary* (with *Published source is a different question*) is kept word for word in
+mxm-kit's [`docs/collection-rules.md`](https://github.com/mxm-audio/mxm-kit/blob/main/docs/collection-rules.md#research-boundary),
+and this repository's root `AGENTS.md`, *Research citations*, is its short form. The crate takes the
+repository's licence, GPL-3.0-or-later.
 
 ## The read never crosses the record head, in either direction or head state
 

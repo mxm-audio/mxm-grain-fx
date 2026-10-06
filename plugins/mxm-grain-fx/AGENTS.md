@@ -23,7 +23,7 @@ This is an original design from granular technique rather than a copy of a box. 
   displays in `editor/visuals.rs`.
 - `src/telemetry.rs` — lock-free peak, sounding-grain count and the onset ring the timeline draws.
 - `control-map.json` — one role, deliberately (below).
-- `README.md` — product documentation; the licence is the workspace's (`../../LICENSE`).
+- `README.md` — product documentation; the licence is the repository's root `LICENSE` (`../../LICENSE`).
 
 # Local Contracts
 
@@ -148,7 +148,9 @@ Run `clap-validator` in debug and release. The debug run also checks that window
 telemetry are built off the audio thread rather than allocated in `process`.
 
 **Not verified**: the design system's §15 QA gate by eye, a real DAW, and the owner's listening gate,
-which is what the shell was built for. Fidelity is UNVERIFIED by the root's default.
+which is what the shell was built for. Fidelity is UNVERIFIED by the root's default (the monorepo
+root's, before the split; the owner's working preference: never imply verification that did not
+happen).
 
 # Child DOX Index
 
