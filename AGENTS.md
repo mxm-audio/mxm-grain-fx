@@ -118,7 +118,7 @@ this repository has no host tests yet.
 Each folder with an `AGENTS.md` owns its contents; the index is below.
 
 **Dependencies are pinned exactly and `Cargo.lock` is committed.** The kit comes from mxm-kit at
-`v0.3.0`, another product's crates from its repository at a tag, and nice-plug and
+`v0.4.0`, another product's crates from its repository at a tag, and nice-plug and
 egui-baseview from their MXM forks (`[patch.crates-io]`).
 
 **One tier of tests so far.** `cargo test` builds the plugin and its DSP only — the loop for a
