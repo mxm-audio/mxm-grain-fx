@@ -129,7 +129,7 @@ never builds the player (checked 2026-10-06: neither `Cargo.toml`'s members nor 
 ## Windows, Linux and macOS — all three, always
 
 **An absolute requirement.** Everything here runs on all three; a change that works on one and
-breaks another is a broken change. CI builds and tests on all three, on `v*` release tags or
+breaks another is a broken change. CI builds and tests on all three, on `v*` tags or
 when started by hand (the owner, 2026-10-06); before a push, Windows and Linux are checked
 locally (*Verification*).
 
@@ -173,8 +173,8 @@ cargo xtask bundle mxm-grain-fx --release
 # no slow tier yet: there is no mxm-grain-fx-host-tests package to run through MXM Player
 ```
 
-Before a push, run the first three on Windows and again on Linux (a Linux machine, or WSL
-on Windows). CI runs the same on Windows, macOS and Linux, but only on `v*` release tags or
+Before a push, run the first three on Windows; Linux and macOS are checked
+later, together (the owner, 2026-10-06). CI runs the same on Windows, macOS and Linux, but only on `v*` tags or
 when started by hand (the owner, 2026-10-06), so only CI reaches macOS.
 
 # Child DOX Index
