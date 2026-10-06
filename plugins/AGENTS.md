@@ -13,11 +13,11 @@ machine only lives in its own `AGENTS.md` below.
 
 # Ownership
 
-- Owns each `plugins/<plugin>/`: `Cargo.toml`, `README.md`, `control-map.json`, `presets/`, `src/`
-  and `host-tests/`. Not the DSP (`crates/<plugin>-dsp`) and not styling (mxm-kit's `mxm-ui`).
-- `host-tests/` is the plugin heard through MXM Player, a separate package so `cargo test -p
-  <plugin>` (the fast tier) never builds the player. The slow tier: `cargo xtask bundle <plugin>
-  --release`, then `cargo test -p <plugin>-host-tests`. [More](https://github.com/mxm-audio/mxm-kit/blob/main/docs/plugin-conventions.md#ownership)
+- Owns each `plugins/<plugin>/`: `Cargo.toml`, `README.md`, `control-map.json`, `presets/` and
+  `src/`. Not the DSP (`crates/<plugin>-dsp`) and not styling (mxm-kit's `mxm-ui`).
+- No `host-tests/` package yet: this plugin is checked by its own `cargo test`. Tests through MXM
+  Player, when added, go in a separate `<plugin>-host-tests` package, so the fast tier never builds
+  the player.
 - The shared checks are `mxm-plugin-test` (a dev-dependency): `keyboard_checks`, `paging_checks`,
   `opening_size`, `time_text_checks`, `tree_checks`, `routing_checks`, `hover_text`. Keep them whole.
 - `crate-type = ["cdylib", "lib"]`. Never enable nice-plug's `standalone` feature: it puts cpal and

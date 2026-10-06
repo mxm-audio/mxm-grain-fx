@@ -6,7 +6,7 @@ Issues and pull requests are welcome.
   the working rules: what each part owns, what it must not do, and how it is checked.
 - **All three platforms.** Windows, macOS and Linux; anything platform-specific is `cfg`-gated with
   every arm implemented.
-- **Check before you send** — the fast tier, then the host tests if you changed what a player hears:
+- **Check before you send** — the checks below (this repository has no host tests yet):
 
   ```bash
   cargo fmt --all -- --check
