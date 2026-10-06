@@ -173,8 +173,8 @@ cargo xtask bundle mxm-grain-fx --release
 # no slow tier yet: there is no mxm-grain-fx-host-tests package to run through MXM Player
 ```
 
-Before a push, run the first three on Windows and again on Linux in WSL (the workspace's
-`wsl/AGENTS.md`). CI runs the same on Windows, macOS and Linux, but only on `v*` release tags or
+Before a push, run the first three on Windows and again on Linux (a Linux machine, or WSL
+on Windows). CI runs the same on Windows, macOS and Linux, but only on `v*` release tags or
 when started by hand (the owner, 2026-10-06), so only CI reaches macOS.
 
 # Child DOX Index
