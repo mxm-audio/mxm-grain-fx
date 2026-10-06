@@ -1,0 +1,21 @@
+[package]
+name = "mxm-grain-fx-dsp"
+description = "Framework-free DSP for mxm-grain-fx: a granular processor on a live capture buffer"
+version.workspace = true
+edition.workspace = true
+# No dependencies at all: genuinely portable, so it does NOT inherit the 1.95 GUI floor.
+rust-version = "1.87"
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+
+# Measurement rulers for the tests and listening harnesses only — a dev-dependency, outside the
+# shipped graph, with no dependencies of its own and at this same floor.
+[dev-dependencies]
+mxm-measure.workspace = true
+# Listening demos write through the collection's encoder and their tests read back through its
+# decoder. Test-only edges, so neither is in the shipped graph.
+mxm-audio-file.workspace = true
+mxm-audio-file-decode.workspace = true

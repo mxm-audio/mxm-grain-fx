@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "_comment": [
+    "Which of mxm-grain-fx's parameters fill the collection's control roles.",
+    "Roles come from docs/MXM_CONTROL_MAP.md, which is normative; parameters are named by",
+    "their permanent string id, never by display name.",
+    "",
+    "ONE ROLE, DELIBERATELY, AND A PAGE THAT IS NOT HERE YET.",
+    "",
+    "`fx.delay` already existed and this plugin's Mix is the same quantity - how much of the",
+    "effect is in what you hear - so it fills the role rather than minting one. That is",
+    "mxm-folded-spring's precedent and mxm-bucket-delay's after it.",
+    "",
+    "The seven performed roles this product wants are NOT here, and that is the point.",
+    "plans/plan-mxm-grain-fx.md holds page 13 by a ranked policy rather than an inventory, and",
+    "fixes the ranking AT THE LISTENING GATE - because the gate can still change which controls",
+    "are performed at all. Decision 9 alone decides whether five spray depths become controls or",
+    "two do. Roles are permanent once authored, so authoring seven of them against a parameter",
+    "set the gate may still move would be minting permanence out of a guess.",
+    "",
+    "So: Mix reuses the role that exists, everything else stays unmapped until the gate, and",
+    "page 13 is added to docs/MXM_CONTROL_MAP.md in the same pass that fixes the ranking."
+  ],
+  "instruments": [
+    {
+      "clap_id": "dk.mxm.mxm-grain-fx",
+      "name": "mxm-grain-fx",
+      "params": {
+        "fx.delay": "mix"
+      }
+    }
+  ]
+}
