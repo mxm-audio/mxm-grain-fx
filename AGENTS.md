@@ -117,8 +117,8 @@ Root owns `Cargo.toml`, `Cargo.lock`, `LICENSE`, `NOTICE.md`, `TRADEMARKS.md`, `
 this repository has no host tests yet.
 Each folder with an `AGENTS.md` owns its contents; the index is below.
 
-**Dependencies are pinned exactly and `Cargo.lock` is committed.** The kit comes from mxm-kit at
-`v0.4.0`, another product's crates from its repository at a tag, and nice-plug and
+**Dependencies follow each repository's `main`, and `Cargo.lock` pins the exact commit.** The kit comes from mxm-kit's
+`main`, another product's crates from its repository's `main`, and nice-plug and
 egui-baseview from their MXM forks (`[patch.crates-io]`).
 
 **One tier of tests so far.** `cargo test` builds the plugin and its DSP only — the loop for a
@@ -129,8 +129,7 @@ never builds the player (checked 2026-10-06: neither `Cargo.toml`'s members nor 
 ## Windows, Linux and macOS — all three, always
 
 **An absolute requirement.** Everything here runs on all three; a change that works on one and
-breaks another is a broken change. CI builds and tests on all three, on `v*` tags or
-when started by hand (the owner, 2026-10-06); before a push, Windows and Linux are checked
+breaks another is a broken change. CI builds and tests on all three, when started by hand (the owner, 2026-10-06); before a push, Windows and Linux are checked
 locally (*Verification*).
 
 - **Anything platform-specific is `cfg`-gated with every arm implemented**, never one arm and a
@@ -174,8 +173,7 @@ cargo xtask bundle mxm-grain-fx --release
 ```
 
 Before a push, run the first three on Windows; Linux and macOS are checked
-later, together (the owner, 2026-10-06). CI runs the same on Windows, macOS and Linux, but only on `v*` tags or
-when started by hand (the owner, 2026-10-06), so only CI reaches macOS.
+later, together (the owner, 2026-10-06). CI runs the same on Windows, macOS and Linux, only when started by hand (the owner, 2026-10-06), so only CI reaches macOS.
 
 # Child DOX Index
 
