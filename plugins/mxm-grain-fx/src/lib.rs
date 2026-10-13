@@ -70,7 +70,7 @@ impl MxmGrainFx {
         // A restored state is resolved afresh by the next block: activation must not seed the
         // engine with the division the previous state was synced to.
         self.synced = [None; 2];
-        self.sample_rate = valid_sample_rate(sample_rate);
+        self.sample_rate = mxm_grain_fx_dsp::sanitise_rate(sample_rate);
         self.input_channels = input_channels.clamp(1, 2);
         self.engine = GrainEngine::new(self.sample_rate);
         // Every allocation happens here, never in `process`.
@@ -327,14 +327,6 @@ impl ClapPlugin for MxmGrainFx {
 
 nice_export_clap!(MxmGrainFx);
 
-fn valid_sample_rate(sample_rate: f32) -> f32 {
-    if sample_rate.is_finite() {
-        sample_rate.clamp(8_000.0, 384_000.0)
-    } else {
-        48_000.0
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -351,6 +343,26 @@ mod tests {
             let normalised = param.preview_normalized(value);
             let _ = param._internal_set_normalized_value(normalised);
             param._internal_update_smoother(48_000.0, true);
+        }
+    }
+
+    #[test]
+    fn the_engine_runs_at_the_hosts_rate_across_the_range_the_dsp_is_built_for() {
+        // The DSP is built and tested from 1 kHz (where clap-validator sweeps) to 768 kHz. A plugin
+        // that clamped tighter told the engine 8 kHz at a 1 kHz host, so every time in it ran eight
+        // times slow, and the tail it reported was eight times long.
+        for rate in [1_000.0, 8_000.0, 48_000.0, 384_000.0, 768_000.0] {
+            let mut plugin = MxmGrainFx::default();
+            plugin.prepare(rate, 2, 512);
+            assert_eq!(
+                plugin.sample_rate, rate,
+                "the plugin's own rate at {rate} Hz"
+            );
+            assert_eq!(
+                plugin.engine.sample_rate(),
+                rate,
+                "the engine's rate at {rate} Hz"
+            );
         }
     }
 

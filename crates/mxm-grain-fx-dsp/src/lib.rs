@@ -1041,7 +1041,11 @@ impl GrainEngine {
     }
 }
 
-fn sanitise_rate(sample_rate: f32) -> f32 {
+/// The sample rate the engine runs at for a host's `sample_rate`: the range this crate is built and
+/// tested for (1 kHz, where clap-validator sweeps, to 768 kHz), and 48 kHz for a rate that is not a
+/// number. **The plugin takes its rate from here** rather than clamping its own, so the two cannot
+/// disagree about which rates are real.
+pub fn sanitise_rate(sample_rate: f32) -> f32 {
     if sample_rate.is_finite() {
         sample_rate.clamp(1_000.0, 768_000.0)
     } else {

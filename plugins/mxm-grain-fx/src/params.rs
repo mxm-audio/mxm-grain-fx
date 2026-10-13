@@ -11,27 +11,11 @@ use mxm_grain_fx_dsp::{
     BUFFER_S, MAX_DENSITY_HZ, MAX_LENGTH_S, MAX_LEVEL_DROP_DB, MAX_PITCH_SEMITONES, MIN_DENSITY_HZ,
     MIN_LENGTH_S,
 };
+use mxm_params::text;
+use mxm_params::text::{StringToValue, ValueToString};
 use mxm_preset::PresetIdentity;
 use nice_plug::prelude::*;
 use std::sync::{Arc, RwLock};
-
-type ValueToString = Arc<dyn Fn(f32) -> String + Send + Sync>;
-type StringToValue = Arc<dyn Fn(&str) -> Option<f32> + Send + Sync>;
-
-fn percent_to_string() -> ValueToString {
-    Arc::new(|value| format!("{:.0} %", value * 100.0))
-}
-
-fn string_to_percent() -> StringToValue {
-    Arc::new(|text| {
-        text.trim()
-            .trim_end_matches('%')
-            .trim()
-            .parse::<f32>()
-            .ok()
-            .map(|value| value / 100.0)
-    })
-}
 
 /// Milliseconds below a second, seconds above — chosen from the *rounded* display value so a host's
 /// text round-trip is idempotent, the trap `mxm-shimmer` records for frequencies.
@@ -334,7 +318,7 @@ pub struct MxmGrainFxParams {
 
 impl Default for MxmGrainFxParams {
     fn default() -> Self {
-        let percent = || (percent_to_string(), string_to_percent());
+        let percent = || (text::percent(), text::parse_percent());
 
         let float = |name: &str, default: f32| {
             let (v2s, s2v) = percent();
@@ -777,89 +761,18 @@ mod tests {
         }
     }
 
-    /// One trip through the host, as nice-plug's CLAP wrapper makes it (`vendor/nice-plug` before
-    /// the split; the mxm-audio/nice-plug fork since 2026-10-06): the CLAP value is the
-    /// normalized value times the step count, the text carries the unit, and the parsed text
-    /// comes back through the parameter's normalized conversion before it is formatted again.
-    /// Returns the failure, if the text changed or did not parse.
-    ///
-    /// # Safety
-    ///
-    /// `ptr` must point at a parameter that outlives the call.
-    unsafe fn host_round_trip(id: &str, ptr: ParamPtr, clap_value: f64) -> Option<String> {
-        unsafe {
-            let steps = ptr.step_count().unwrap_or(1);
-            let normalised = clap_value as f32 / steps as f32;
-            let first = ptr.normalized_value_to_string(normalised, true);
-            let Some(parsed) = ptr.string_to_normalized_value(&first) else {
-                return Some(format!("{id}: {first:?} does not parse"));
-            };
-            let back = parsed as f64 * steps as f64;
-            let second = ptr.normalized_value_to_string(back as f32 / steps as f32, true);
-            (second != first).then(|| {
-                format!(
-                    "{id} at plain {}: {first:?} came back {second:?}",
-                    ptr.preview_plain(normalised)
-                )
-            })
-        }
-    }
-
-    /// **Every parameter's text survives the host's normalized conversion unchanged.** A host
-    /// formats a value, parses the text, normalizes the result and formats that again; the text has
-    /// to come back identical, and `clap-validator`'s `param-conversions` checks exactly that — on
-    /// a grid of its own, so a clean validator run proves nothing about a sliver between its points.
-    ///
-    /// **Formatted with the unit, which is the path that actually ships.** This test once passed
-    /// `include_unit: false`, which neither the validator nor the editor does: `param-conversions`
-    /// asks through CLAP, which always includes the unit, and `mxm-preset`'s `ErasedParam::text`
-    /// does the same because §6 makes the unit part of the value.
-    ///
-    /// **Branch points, not only a grid.** On the twenty-step grid alone it passed Grain rate
-    /// printing `10.0 grains/s` for 9.97, which parses to ten and comes back `10 grains/s`, and Onset
-    /// timing printing `Jittered 100 %` for 0.498, which parses to one half and comes back
-    /// `Handed over 0 %`. Both chose their branch from the raw value.
-    ///
-    /// Probes, for every parameter in `param_map` rather than a list someone has to extend: the
-    /// twenty-step grid; `clap-validator` 0.4.1's own grid, whose size follows the parameter count;
-    /// both sides of every branch point in [`branch_points`]; and a hair either side of zero on a
-    /// range that crosses it.
+    /// **Every parameter's text survives the host's round trip**, with the unit on, across the
+    /// collection's grids and switch points (`mxm_plugin_test::text_checks`), plus both sides of
+    /// every branch point in [`branch_points`].
     #[test]
-    fn text_round_trips_are_idempotent() {
+    fn every_parameter_text_survives_the_hosts_round_trip() {
         let params = MxmGrainFxParams::default();
-        let map = params.param_map();
-        let validator_points = 4000usize.div_ceil(map.len()).clamp(5, 100);
-        let mut failures = Vec::new();
-        for (id, ptr, _) in map {
-            // SAFETY: `params` owns every parameter these pointers refer to and outlives the loop;
-            // this is the access `param-conversions` makes through CLAP.
-            unsafe {
-                let steps = ptr.step_count().unwrap_or(1) as f64;
-                let mut probes: Vec<f64> = (0..=19).map(|i| steps * i as f64 / 19.0).collect();
-                probes.extend(
-                    (0..validator_points)
-                        .map(|i| steps * (i as f64 / (validator_points - 1) as f64)),
-                );
-                let mut plains: Vec<f32> = branch_points(&id)
-                    .into_iter()
-                    .flat_map(|(point, step)| around(point, step))
-                    .collect();
-                let (low, high) = (ptr.preview_plain(0.0), ptr.preview_plain(1.0));
-                if low.min(high) < 0.0 && low.max(high) > 0.0 {
-                    plains.extend([-1.0e-3, -1.0e-4, 0.0, 1.0e-4, 1.0e-3]);
-                }
-                probes.extend(
-                    plains
-                        .into_iter()
-                        .map(|plain| ptr.preview_normalized(plain) as f64 * steps),
-                );
-                failures.extend(
-                    probes
-                        .into_iter()
-                        .filter_map(|value| host_round_trip(&id, ptr, value)),
-                );
-            }
-        }
-        assert!(failures.is_empty(), "{}", failures.join("\n"));
+        let boundaries: Vec<f32> = params
+            .param_map()
+            .iter()
+            .flat_map(|(id, _, _)| branch_points(id))
+            .flat_map(|(point, step)| around(point, step))
+            .collect();
+        mxm_plugin_test::text_checks::every_text_round_trips(&params, &boundaries);
     }
 }

@@ -117,6 +117,11 @@ automation crossing zero repeatedly under a live feedback tail cannot expose hel
 - **A reading that changes unit, precision or words chooses the branch from the rounding its finer
   branch prints**, never from the raw value.
 
+- **The engine runs at the host's rate across the DSP's whole range**: the plugin takes its rate
+  from `mxm_grain_fx_dsp::sanitise_rate`, never a clamp of its own. It clamped to 8–384 kHz while
+  the DSP is built and tested from 1 kHz to 768 kHz, so at the validator's 1 kHz every time ran
+  eight times slow (`the_engine_runs_at_the_hosts_rate_across_the_range_the_dsp_is_built_for`).
+
 # Work Guidance
 
 - Measure a closed-loop change; compiling a granular feedback effect proves nothing about character

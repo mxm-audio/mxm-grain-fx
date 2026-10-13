@@ -63,30 +63,12 @@ fn render_tone(controls: &Controls, seconds: f32) -> Vec<f32> {
 
 /// Magnitude at one frequency, by Goertzel over the whole block.
 fn magnitude_at(signal: &[f32], hz: f32) -> f32 {
-    let w = core::f64::consts::TAU * f64::from(hz) / f64::from(RATE);
-    let (c, s) = (w.cos(), w.sin());
-    let coeff = 2.0 * c;
-    let (mut s1, mut s2) = (0.0f64, 0.0f64);
-    for &v in signal {
-        let s0 = f64::from(v) + coeff * s1 - s2;
-        s2 = s1;
-        s1 = s0;
-    }
-    let real = s1 - s2 * c;
-    let imag = s2 * s;
-    ((real * real + imag * imag).sqrt() / (signal.len() as f64 / 2.0)) as f32
+    mxm_measure::spectrum::component_amplitude(signal, f64::from(hz), f64::from(RATE))
+        .expect("a finite, non-empty block") as f32
 }
 
 fn rms(signal: &[f32]) -> f32 {
-    if signal.is_empty() {
-        return 0.0;
-    }
-    (signal
-        .iter()
-        .map(|v| f64::from(*v) * f64::from(*v))
-        .sum::<f64>()
-        / signal.len() as f64)
-        .sqrt() as f32
+    mxm_measure::level::rms(signal).expect("a finite, non-empty block") as f32
 }
 
 fn db(x: f32) -> f32 {

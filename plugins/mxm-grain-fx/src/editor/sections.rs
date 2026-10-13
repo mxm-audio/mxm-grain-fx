@@ -91,7 +91,7 @@ pub fn all_parameters(params: &MxmGrainFxParams) -> Vec<Bound<'_>> {
             "Transposes the grains; sweeping it steps rather than glides.",
         )
         .bipolar()
-        .law(mxm_preset::StepLaw::Semitones),
+        .law(mxm_params::StepLaw::Semitones),
         Bound::new(
             "reversechance",
             &params.reverse_chance,
