@@ -5,7 +5,7 @@
 //! computed from the controls.
 
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 use mxm_grain_fx_dsp::Onset;
 
@@ -17,9 +17,10 @@ use mxm_grain_fx_dsp::Onset;
 pub const ONSET_SLOTS: usize = 256;
 
 pub struct Telemetry {
-    peak: AtomicU32,
+    /// The output level and its clip latch: the collection's one meter policy
+    /// (`mxm_telemetry::PeakMeter`).
+    pub meter: mxm_telemetry::PeakMeter,
     grains: AtomicU32,
-    clipped: AtomicBool,
     /// The engine's sample clock at the end of the last published block.
     clock: AtomicU64,
     /// Recent onsets, each packed as `age_fraction` bits in the high word and a truncated sample
@@ -42,9 +43,8 @@ impl Default for Telemetry {
 impl Telemetry {
     pub fn new() -> Self {
         Self {
-            peak: AtomicU32::new(0),
+            meter: mxm_telemetry::PeakMeter::new(),
             grains: AtomicU32::new(0),
-            clipped: AtomicBool::new(false),
             clock: AtomicU64::new(0),
             onsets: std::array::from_fn(|_| AtomicU64::new(0)),
             onsets_written: AtomicU64::new(0),
@@ -69,17 +69,10 @@ impl Telemetry {
     }
 
     pub fn publish(&self, peak: f32, grains: usize) {
-        Self::publish_max(&self.peak, peak);
+        self.meter.publish(peak);
         // The sounding grain count, so the meter can say how busy the cloud is. Max-combined and
         // reset on read like the peak, so a frame the editor missed cannot hide a burst.
         Self::publish_max(&self.grains, grains as f32);
-        if peak >= 1.0 {
-            self.clipped.store(true, Ordering::Relaxed);
-        }
-    }
-
-    pub fn take_peak(&self) -> f32 {
-        f32::from_bits(self.peak.swap(0, Ordering::Relaxed))
     }
 
     pub fn take_grains(&self) -> f32 {
@@ -126,13 +119,5 @@ impl Telemetry {
             *slot = (packed as u32, f32::from_bits((packed >> 32) as u32));
         }
         take
-    }
-
-    pub fn clipped(&self) -> bool {
-        self.clipped.load(Ordering::Relaxed)
-    }
-
-    pub fn clear_clip(&self) {
-        self.clipped.store(false, Ordering::Relaxed);
     }
 }
