@@ -33,13 +33,10 @@ fn probe(controls: &Controls) -> (f64, usize) {
     let mut right = [0.0f32; BLOCK];
     // A deterministic broadband input. Silence would leave the grains reading zeros, which costs
     // the same but would let a future denormal-flush change hide here.
-    let mut noise: u32 = 0x1234_5678;
+    let mut noise = mxm_rng::Xorshift32::from_state(0x1234_5678);
     let mut fill = |left: &mut [f32; BLOCK], right: &mut [f32; BLOCK]| {
         for i in 0..BLOCK {
-            noise ^= noise << 13;
-            noise ^= noise >> 17;
-            noise ^= noise << 5;
-            let x = (noise >> 8) as f32 / 8_388_608.0 - 1.0;
+            let x = noise.bipolar_f32();
             left[i] = x * 0.25;
             right[i] = -x * 0.25;
         }

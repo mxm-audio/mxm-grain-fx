@@ -44,12 +44,11 @@ fn measure(controls: &Controls, seconds: f32) -> Decay {
 
     // Two seconds of a broadband burst, so the buffer holds something with structure.
     let burst = (RATE * 2.0) as usize;
-    let mut state = 9_871u32;
+    let mut rng = mxm_rng::Lcg32::new(9_871);
     let mut l = vec![0.0f32; burst];
     let mut r = vec![0.0f32; burst];
     for i in 0..burst {
-        state = state.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
-        let noise = (state >> 9) as f32 / 8_388_608.0 - 1.0;
+        let noise = (rng.next_u32() >> 9) as f32 / 8_388_608.0 - 1.0;
         let tone = (i as f32 * 220.0 * core::f32::consts::TAU / RATE).sin();
         l[i] = 0.4 * tone + 0.2 * noise;
         r[i] = l[i];

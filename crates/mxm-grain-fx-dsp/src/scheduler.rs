@@ -24,7 +24,7 @@
 //! the count, and the same travel that replaces one process with the other moves the law. Regime
 //! and law change together, so there is no undefined region between them.
 
-use crate::rng::Rng;
+use mxm_rng::Xorshift64Star;
 
 /// Where jitter ends and the hand-over begins, as a fraction of the control's travel.
 ///
@@ -100,15 +100,15 @@ impl Scheduler {
     /// not a defect to be guarded against but the Poisson statistics the asynchronous branch is
     /// there to provide.
     #[inline]
-    pub(crate) fn tick(&mut self, slot: f32, scatter: Scatter, rng: &mut Rng) -> u32 {
+    pub(crate) fn tick(&mut self, slot: f32, scatter: Scatter, rng: &mut Xorshift64Star) -> u32 {
         let slot = slot.max(1.0);
         if self.slot_position >= self.slot_length {
             // A new slot. Carry the overshoot so onsets do not drift against the sample clock, and
             // adopt the current control value here rather than mid-slot.
             self.slot_position -= self.slot_length;
             self.slot_length = slot;
-            self.offset = rng.unit() * scatter.jitter * slot;
-            self.suppressed = rng.unit() < scatter.handover;
+            self.offset = rng.unit_f32() * scatter.jitter * slot;
+            self.suppressed = rng.unit_f32() < scatter.handover;
             self.armed = true;
         }
 
@@ -117,7 +117,7 @@ impl Scheduler {
             self.armed = false;
             starts += 1;
         }
-        if scatter.handover > 0.0 && rng.unit() < scatter.handover / slot {
+        if scatter.handover > 0.0 && rng.unit_f32() < scatter.handover / slot {
             starts += 1;
         }
         self.slot_position += 1.0;
@@ -132,7 +132,7 @@ mod tests {
     /// Run the scheduler for `samples` and return the onset times.
     fn onsets(slot: f32, scatter: f32, samples: usize) -> Vec<usize> {
         let mut s = Scheduler::new();
-        let mut rng = Rng::new();
+        let mut rng = crate::rng::seeded();
         let sc = Scatter::from_control(scatter);
         let mut out = Vec::new();
         for n in 0..samples {
@@ -240,7 +240,7 @@ mod tests {
     fn the_phasor_is_silent_at_the_top() {
         // At full hand-over every slot is suppressed, so every onset came from the per-sample draw.
         let mut s = Scheduler::new();
-        let mut rng = Rng::new();
+        let mut rng = crate::rng::seeded();
         let sc = Scatter::from_control(1.0);
         let mut suppressed_slots = 0;
         let mut slots = 0;

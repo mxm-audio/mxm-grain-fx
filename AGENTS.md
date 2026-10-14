@@ -144,7 +144,7 @@ locally (*Verification*).
 
 | Crate | MSRV | Why |
 |---|---|---|
-| `crates/mxm-grain-fx-dsp` | **1.87** | Likewise — no runtime dependencies; the live capture buffer with its two-heads guard, the scheduler's two branches, the window morph and the recycled loop |
+| `crates/mxm-grain-fx-dsp` | **1.87** | Likewise — one runtime dependency, the dependency-free `mxm-rng`; the live capture buffer with its two-heads guard, the scheduler's two branches, the window morph and the recycled loop |
 | `plugins/mxm-grain-fx` | **1.95** | Its editor pulls in egui; depends on `mxm-grain-fx-dsp`, which stays at 1.87 |
 
 ## Licensing

@@ -68,7 +68,7 @@ pub mod window;
 
 use capture::{Capture, RELEASE_FADE_S, flush};
 use grain::{Direction, Grain};
-use rng::Rng;
+use mxm_rng::Xorshift64Star;
 use scheduler::{Scatter, Scheduler};
 
 /// How many grains may sound at once.
@@ -468,7 +468,7 @@ pub struct GrainEngine {
     capture: Capture,
     grains: [Grain; MAX_GRAINS],
     scheduler: Scheduler,
-    rng: Rng,
+    rng: Xorshift64Star,
     policy: PoolPolicy,
 
     controls: Controls,
@@ -523,7 +523,7 @@ impl GrainEngine {
             ),
             grains: [Grain::silent(); MAX_GRAINS],
             scheduler: Scheduler::new(),
-            rng: Rng::new(),
+            rng: rng::seeded(),
             policy: PoolPolicy::default(),
             controls: Controls::default(),
             shape_cached: f32::NAN,
@@ -610,7 +610,7 @@ impl GrainEngine {
         self.capture.clear();
         self.grains = [Grain::silent(); MAX_GRAINS];
         self.scheduler.reset();
-        self.rng.reset();
+        self.rng = rng::seeded();
         self.mix.value = 0.0;
         self.feedback.value = 0.0;
         self.normalisation.value = 1.0;
@@ -900,12 +900,12 @@ impl GrainEngine {
         // Every draw is inside its own control's domain, which is what makes the worst case
         // enumerable rather than open-ended.
         let length_span = MAX_LENGTH_S - MIN_LENGTH_S;
-        let length_s = (c.length_s + r.length * self.rng.bipolar() * length_span * 0.5)
+        let length_s = (c.length_s + r.length * self.rng.bipolar_f32() * length_span * 0.5)
             .clamp(MIN_LENGTH_S, MAX_LENGTH_S);
-        let semitones = (c.pitch_semitones + r.rate * self.rng.bipolar() * MAX_PITCH_SEMITONES)
+        let semitones = (c.pitch_semitones + r.rate * self.rng.bipolar_f32() * MAX_PITCH_SEMITONES)
             .clamp(-MAX_PITCH_SEMITONES, MAX_PITCH_SEMITONES);
         let rate = (semitones / 12.0).exp2();
-        let direction = if self.rng.unit() < c.reverse {
+        let direction = if self.rng.unit_f32() < c.reverse {
             Direction::Reverse
         } else {
             Direction::Forward
@@ -928,16 +928,16 @@ impl GrainEngine {
         // An absolute target settles as soon as the buffer holds enough to honour it. Before that
         // the clamp holds the read at the oldest material there is, which repeats rather than
         // detunes — a much smaller and more explicable artefact, and one that ends sooner.
-        let position = clamp01(c.position + r.position * self.rng.bipolar());
+        let position = clamp01(c.position + r.position * self.rng.bipolar_f32());
         let target_age = position * BUFFER_S * self.sample_rate;
         let age = target_age.clamp(placement.lowest_age, placement.highest_age);
         // Level is an attenuation from unity and never a boost, and it is drawn in **decibels** so
         // a grain comes out quieter rather than absent. The draw is unconditional even at zero
         // depth: short-circuiting would make the generator's sequence depend on a control value and
         // two renders at different depths would stop being comparable.
-        let level = decibels_below_unity(MAX_LEVEL_DROP_DB * r.level * self.rng.unit());
+        let level = decibels_below_unity(MAX_LEVEL_DROP_DB * r.level * self.rng.unit_f32());
         // One draw, because stereo width is one quantity. See `Randomisation::pan`.
-        let pan = clamp01(0.5 + r.pan * self.rng.bipolar() * 0.5);
+        let pan = clamp01(0.5 + r.pan * self.rng.bipolar_f32() * 0.5);
 
         let Some(slot) = self.take_slot() else {
             return;

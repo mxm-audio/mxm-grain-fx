@@ -5,7 +5,7 @@ Parent: [`../../AGENTS.md`](../../AGENTS.md) · The measurements and reasoning b
 
 # Purpose
 
-Framework-free, zero-dependency DSP for `mxm-grain-fx`: a granular processor on a **live capture
+Framework-free DSP for `mxm-grain-fx`, depending only on `mxm-rng`: a granular processor on a **live capture
 buffer** — a circular recording the input is still being written into, granulated by a scheduler
 that reaches all three onset families, with a recycled feedback loop and a held-buffer freeze.
 
@@ -25,7 +25,7 @@ Product plan: `plans/plan-mxm-grain-fx.md` in the private archive.
 - `src/grain.rs` — one grain, and `place`, the two-heads guard.
 - `src/scheduler.rs` — the two onset branches and the two-segment scatter control between them.
 - `src/window.rs` — the boxcar → triangle → Hann morph, its table and its moments.
-- `src/rng.rs` — the one seeded generator every random draw comes from.
+- `src/rng.rs` — the seed of the one generator (`mxm-rng`'s xorshift64*) every random draw comes from.
 - The onset log lives in `src/lib.rs` beside the engine that writes it: `Onset`, `ONSET_LOG`,
   `clock()`, `onsets()` and `onsets_since()`.
 - `examples/loop_probe.rs`, `examples/gate_measurements.rs` — the measurements in NOTES.md.
