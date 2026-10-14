@@ -5,7 +5,7 @@ Parent: [`../../AGENTS.md`](../../AGENTS.md) · The measurements and reasoning b
 
 # Purpose
 
-Framework-free DSP for `mxm-grain-fx`, depending only on `mxm-rng`: a granular processor on a **live capture
+Framework-free DSP for `mxm-grain-fx`, depending only on `mxm-rng` and `mxm-dsp`: a granular processor on a **live capture
 buffer** — a circular recording the input is still being written into, granulated by a scheduler
 that reaches all three onset families, with a recycled feedback loop and a held-buffer freeze.
 
@@ -20,7 +20,7 @@ Product plan: `plans/plan-mxm-grain-fx.md` in the private archive.
 
 - `src/lib.rs` — the engine: controls, the per-sample loop, normalisation, the recycled feedback
   path, freeze, the engagement edges and the activity/tail declarations.
-- `src/capture.rs` — the circular buffer, addressed by age; the four-point reader; the record head's
+- `src/capture.rs` — the circular buffer (one `mxm_dsp::delay::AgeLine` a channel), addressed by age; the four-point reader; the record head's
   **hold**; the release crossfade.
 - `src/grain.rs` — one grain, and `place`, the two-heads guard.
 - `src/scheduler.rs` — the two onset branches and the two-segment scatter control between them.

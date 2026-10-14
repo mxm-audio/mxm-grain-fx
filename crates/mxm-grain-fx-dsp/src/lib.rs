@@ -68,6 +68,7 @@ pub mod window;
 
 use capture::{Capture, RELEASE_FADE_S, flush};
 use grain::{Direction, Grain};
+use mxm_dsp::guard::finite_or;
 use mxm_rng::Xorshift64Star;
 use scheduler::{Scatter, Scheduler};
 
@@ -1046,15 +1047,7 @@ impl GrainEngine {
 /// number. **The plugin takes its rate from here** rather than clamping its own, so the two cannot
 /// disagree about which rates are real.
 pub fn sanitise_rate(sample_rate: f32) -> f32 {
-    if sample_rate.is_finite() {
-        sample_rate.clamp(1_000.0, 768_000.0)
-    } else {
-        48_000.0
-    }
-}
-
-fn finite_or(value: f32, fallback: f32) -> f32 {
-    if value.is_finite() { value } else { fallback }
+    finite_or(sample_rate, 48_000.0).clamp(1_000.0, 768_000.0)
 }
 
 #[cfg(test)]

@@ -3,7 +3,7 @@ name = "mxm-grain-fx-dsp"
 description = "Framework-free DSP for mxm-grain-fx: a granular processor on a live capture buffer"
 version.workspace = true
 edition.workspace = true
-# One dependency, `mxm-rng`, dependency-free at this floor: genuinely portable, so it does NOT inherit
+# Two dependencies, `mxm-rng` and `mxm-dsp`, dependency-free at this floor: genuinely portable, so it does NOT inherit
 # the 1.95 GUI floor.
 rust-version = "1.87"
 license.workspace = true
@@ -11,6 +11,7 @@ authors.workspace = true
 repository.workspace = true
 
 [dependencies]
+mxm-dsp.workspace = true
 mxm-rng.workspace = true
 
 # Measurement rulers for the tests and listening harnesses only — a dev-dependency, outside the

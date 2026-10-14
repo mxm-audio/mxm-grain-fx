@@ -20,6 +20,7 @@ repository = "https://github.com/mxm-audio/mxm-grain-fx"
 egui = "=0.36.1"
 mxm-audio-file = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-audio-file-decode = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
+mxm-dsp = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-grain-fx-dsp = { path = "crates/mxm-grain-fx-dsp" }
 mxm-measure = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-plugin-test = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }

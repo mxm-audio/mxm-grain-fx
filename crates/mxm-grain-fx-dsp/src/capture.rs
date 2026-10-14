@@ -16,6 +16,8 @@
 //!   across the transition, so the hold is a G1 primitive and freeze (G2) is a product state built
 //!   on top of it.
 
+use mxm_dsp::delay::AgeLine;
+
 /// Samples of guard at each end of the legal read range.
 ///
 /// **Two is exactly what the four-point reader needs, and that is why it was two.** A read at age
@@ -34,12 +36,10 @@ pub(crate) const RELEASE_FADE_S: f32 = 0.010;
 
 #[derive(Debug, Clone)]
 pub(crate) struct Capture {
-    left: Vec<f32>,
-    right: Vec<f32>,
-    /// Where the next sample is written.
-    write: usize,
-    /// How much of the buffer holds real audio, capped at its capacity.
-    written: usize,
+    /// The two channels' lines (`mxm_dsp::delay::AgeLine`), written together, so their histories
+    /// agree; the left one's count is the capture's history.
+    left: AgeLine,
+    right: AgeLine,
     /// While true the record head stands still and grains read a frozen history.
     held: bool,
     /// What arrived while the head was held, kept only so release can crossfade rather than step.
@@ -55,10 +55,8 @@ impl Capture {
         let capacity = capacity.max(16);
         let release_fade = release_fade.max(1);
         Self {
-            left: vec![0.0; capacity],
-            right: vec![0.0; capacity],
-            write: 0,
-            written: 0,
+            left: AgeLine::new(capacity),
+            right: AgeLine::new(capacity),
             held: false,
             side_l: vec![0.0; release_fade],
             side_r: vec![0.0; release_fade],
@@ -70,7 +68,7 @@ impl Capture {
     /// How far back a read may legally reach, in samples.
     #[inline]
     pub(crate) fn history(&self) -> f32 {
-        self.written as f32
+        self.left.written() as f32
     }
 
     #[inline]
@@ -128,16 +126,8 @@ impl Capture {
         } else {
             (l, r)
         };
-        let len = self.left.len();
-        self.left[self.write] = flush(l);
-        self.right[self.write] = flush(r);
-        self.write += 1;
-        if self.write == len {
-            self.write = 0;
-        }
-        if self.written < len {
-            self.written += 1;
-        }
+        self.left.push(flush(l));
+        self.right.push(flush(r));
     }
 
     /// Read both channels at `age` samples behind the record head, four-point cubic.
@@ -163,8 +153,7 @@ impl Capture {
     /// guard is [`crate::grain::place`], and its sweep is what proves grains stay inside.
     #[inline]
     pub(crate) fn read(&self, age: f32) -> (f32, f32) {
-        let len = self.left.len();
-        let history = self.written;
+        let history = self.left.written();
         if history < 2 {
             return (0.0, 0.0);
         }
@@ -176,44 +165,30 @@ impl Capture {
         };
         let whole = age as usize;
         let t = age - whole as f32;
-        // `write` is one past the newest sample, so age 1 is the sample just written and age `a`
-        // sits `a` slots before the write point. One conditional subtract replaces the remainder
-        // this used to take twice: `write < len` and `whole <= len - 1`, so the sum is inside two
-        // laps by construction and a division is never needed.
-        let raw = self.write + len - whole;
-        let i1 = if raw >= len { raw - len } else { raw };
-        // Age decreasing is index increasing, and age increasing is index decreasing.
-        let i0 = if whole > 1 { step_newer(i1, len) } else { i1 };
-        let i2 = step_older(i1, len);
-        let i3 = if whole + 2 <= history {
-            step_older(i2, len)
-        } else {
-            i2
+        // Age 1 is the sample just written. The young tap stays at `whole` when that is age 1, and
+        // the old one repeats `whole + 1` when `whole + 2` would pass the history: every tap is
+        // inside the written history, read by the line's own wrap.
+        let a0 = if whole > 1 { whole - 1 } else { whole };
+        let a2 = whole + 1;
+        let a3 = if whole + 2 <= history { whole + 2 } else { a2 };
+        let tap = |line: &AgeLine| {
+            cubic(
+                line.read(a0),
+                line.read(whole),
+                line.read(a2),
+                line.read(a3),
+                t,
+            )
         };
-        (
-            cubic(
-                self.left[i0],
-                self.left[i1],
-                self.left[i2],
-                self.left[i3],
-                t,
-            ),
-            cubic(
-                self.right[i0],
-                self.right[i1],
-                self.right[i2],
-                self.right[i3],
-                t,
-            ),
-        )
+        (tap(&self.left), tap(&self.right))
     }
 
     /// Discard every sample. Constant time: history is invalidated, not zeroed, because `reset` and
     /// Off can both be reached from the audio thread and a high-rate buffer is tens of thousands of
     /// samples long.
     pub(crate) fn clear(&mut self) {
-        self.write = 0;
-        self.written = 0;
+        self.left.clear();
+        self.right.clear();
         self.side_filled = 0;
         self.release_left = 0;
         self.held = false;
@@ -223,25 +198,12 @@ impl Capture {
     pub(crate) fn resize(&mut self, capacity: usize, release_fade: usize) {
         let capacity = capacity.max(16);
         let release_fade = release_fade.max(1);
-        self.left = vec![0.0; capacity];
-        self.right = vec![0.0; capacity];
+        self.left = AgeLine::new(capacity);
+        self.right = AgeLine::new(capacity);
         self.side_l = vec![0.0; release_fade];
         self.side_r = vec![0.0; release_fade];
         self.clear();
     }
-}
-
-/// One slot newer — the neighbour at one sample less age.
-#[inline]
-fn step_newer(index: usize, len: usize) -> usize {
-    let next = index + 1;
-    if next == len { 0 } else { next }
-}
-
-/// One slot older — the neighbour at one sample more age.
-#[inline]
-fn step_older(index: usize, len: usize) -> usize {
-    if index == 0 { len - 1 } else { index - 1 }
 }
 
 /// Catmull-Rom between `p1` and `p2`, with `p0` and `p3` as the outer taps.
@@ -348,15 +310,13 @@ mod tests {
     /// The linear reader this one replaced, kept as the reference the improvement is measured
     /// against — the same way `mxm-creative-sampler-dsp` keeps the kernel its table replaced.
     fn read_linear(c: &Capture, age: f32) -> f32 {
-        let len = c.left.len();
-        let history = c.written;
+        let history = c.left.written();
         let age = age.clamp(1.0, (history - 1) as f32);
         let newer_age = age as usize;
         let fraction = age - newer_age as f32;
         let older_age = (newer_age + 1).min(history - 1);
-        let newer = (c.write + len - newer_age) % len;
-        let older = (c.write + len - older_age) % len;
-        c.left[newer] + fraction * (c.left[older] - c.left[newer])
+        let (newer, older) = (c.left.read(newer_age), c.left.read(older_age));
+        newer + fraction * (older - newer)
     }
 
     /// How far the reader's error sits below the signal, in dB, for a sine read back at `rate`.
