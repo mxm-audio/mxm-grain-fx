@@ -198,7 +198,7 @@ dependencies = [
 [[package]]
 name = "baseview"
 version = "0.3.6"
-source = "git+https://github.com/mxm-audio/baseview?branch=main#0b04fdd2520ffcffe2f02ee47907394e23ff384d"
+source = "git+https://github.com/mxm-audio/baseview?branch=main#a0d8979d63f36945e026ae6837b1602d85e22713"
 dependencies = [
  "block2 0.6.2",
  "bytemuck",
