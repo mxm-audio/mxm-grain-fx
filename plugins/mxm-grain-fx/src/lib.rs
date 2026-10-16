@@ -325,7 +325,36 @@ impl ClapPlugin for MxmGrainFx {
     ];
 }
 
+impl Vst3Plugin for MxmGrainFx {
+    /// Permanent, as `CLAP_ID` is: the CLAP id's hash written out, held to it by
+    /// `identity::the_vst3_class_id_is_the_clap_ids_hash`.
+    const VST3_CLASS_ID: [u8; 16] = [
+        0xc7, 0x7a, 0x20, 0x68, 0x8a, 0xed, 0x91, 0xdc, 0x5e, 0x7b, 0x31, 0x2a, 0x4a, 0x88, 0x52,
+        0x3f,
+    ];
+    const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] =
+        &[Vst3SubCategory::Fx, Vst3SubCategory::Delay];
+}
+
 nice_export_clap!(MxmGrainFx);
+nice_export_vst3!(MxmGrainFx);
+
+/// The plugin's identity in each format.
+#[cfg(test)]
+mod identity {
+    use super::MxmGrainFx;
+    use mxm_plugin_test::formats;
+
+    #[test]
+    fn the_vst3_class_id_is_the_clap_ids_hash() {
+        formats::the_vst3_class_id_is_the_clap_ids_hash::<MxmGrainFx>();
+    }
+
+    #[test]
+    fn the_vst3_categories_follow_the_clap_features() {
+        formats::the_vst3_categories_follow_the_clap_features::<MxmGrainFx>();
+    }
+}
 
 #[cfg(test)]
 mod tests {
