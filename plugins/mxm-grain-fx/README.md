@@ -7,7 +7,7 @@ starts and fixed for its life.
 
 Part of the MXM collection ([github.com/mxm-audio](https://github.com/mxm-audio)); this repository's
 [README](../../README.md). GPL-3.0-or-later — see the repository's [`LICENSE`](../../LICENSE) at its
-root. CLAP only.
+root. A CLAP and a VST®3 plugin.
 
 ## What it does
 
