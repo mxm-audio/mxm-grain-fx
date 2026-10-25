@@ -3,6 +3,14 @@ resolver = "3"
 members = [
     "crates/mxm-grain-fx-dsp",
     "plugins/mxm-grain-fx",
+    "plugins/mxm-grain-fx/host-tests",
+    "xtask",
+]
+# The fast tier: `cargo build` and `cargo test` here never build MXM Player or a
+# standalone audio backend; `cargo test --workspace` adds the host tests (the slow tier).
+default-members = [
+    "crates/mxm-grain-fx-dsp",
+    "plugins/mxm-grain-fx",
     "xtask",
 ]
 
@@ -24,6 +32,8 @@ mxm-dsp = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-editor = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-grain-fx-dsp = { path = "crates/mxm-grain-fx-dsp" }
 mxm-measure = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
+mxm-player = { git = "https://github.com/mxm-audio/mxm-player", branch = "main" }
+mxm-player-harness = { git = "https://github.com/mxm-audio/mxm-player", branch = "main" }
 mxm-plugin-test = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-preset = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-params = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }

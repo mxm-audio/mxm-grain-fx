@@ -1,0 +1,21 @@
+[package]
+name = "mxm-grain-fx-host-tests"
+description = "mxm-grain-fx hosted by MXM Player: discovery, parameters, the state path and the effect chain through the real host, against its release bundle. The slow tier: `cargo test -p mxm-grain-fx` never builds the player."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+# The tests are in `tests/`; the library is empty and not test-built.
+test = false
+doctest = false
+
+[dev-dependencies]
+mxm-player.workspace = true
+mxm-player-harness.workspace = true
+# A changed parameter is written into the saved state, as a host restores one; the player's version.
+serde_json = "=1.0.145"

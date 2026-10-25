@@ -23,6 +23,8 @@ This is an original design from granular technique rather than a copy of a box. 
   displays in `editor/visuals.rs`.
 - `src/telemetry.rs` — lock-free peak, sounding-grain count and the onset ring the timeline draws.
 - `control-map.json` — one role, deliberately (below).
+- `host-tests/` — the release bundle through MXM Player: discovery and the map's role, every
+  parameter read, a changed parameter saved and reopened, the default sound and bypass.
 - `README.md` — product documentation; the licence is the repository's root `LICENSE` (`../../LICENSE`).
 
 # Local Contracts
@@ -139,7 +141,12 @@ cargo clippy -p mxm-grain-fx --all-targets
 MXM_PICTURES=after cargo test -p mxm-grain-fx --lib tree_pictures -- --ignored
 cargo xtask bundle mxm-grain-fx --release
 clap-validator validate "target/bundled/mxm-grain-fx.clap"
+cargo xtask fetch                                       # mxm-mono-01, the source the chain plays
+cargo test -p mxm-grain-fx-host-tests --test effect_chain
 ```
+
+`PARAMETERS` and the Mix default in the host test restate `src/params.rs`: a parameter added,
+removed or re-defaulted at the gate fails there by name.
 
 - Rename-sensitive guards: `every_parameter_is_bound_exactly_once`,
   `every_binding_carries_a_description`, `every_card_has_a_body`,

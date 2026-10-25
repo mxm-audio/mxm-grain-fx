@@ -29,3 +29,7 @@ jobs:
         run: cargo test --locked
       - name: Release bundle
         run: cargo xtask bundle mxm-grain-fx --release
+      - name: Plugins the host tests load
+        run: cargo xtask fetch
+      - name: Host tests (slow tier)
+        run: cargo test --locked -p mxm-grain-fx-host-tests
