@@ -57,10 +57,6 @@ impl Instrument for MxmGrainFxParams {
         &self.preset
     }
 
-    fn factory_files(&self) -> &'static [(&'static str, &'static str)] {
-        &[]
-    }
-
     fn default_missing_legacy_parameter(&self, id: &str) -> bool {
         TEMPO_SYNC_IDS.contains(&id)
     }
