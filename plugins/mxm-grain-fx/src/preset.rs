@@ -29,6 +29,11 @@ impl Instrument for MxmGrainFxParams {
         crate::CLAP_ID
     }
 
+    /// The plugin's version, its `Plugin::VERSION`: its factory presets are installed for it.
+    fn version(&self) -> &'static str {
+        env!("CARGO_PKG_VERSION")
+    }
+
     fn parameters(&self) -> Vec<(&'static str, &dyn mxm_params::ErasedParam)> {
         // Declaration order is the preset and Init write order. It is deliberately independent of
         // the editor's signal-flow order, which may change without changing host-facing writes.
